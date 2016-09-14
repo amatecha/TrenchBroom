@@ -31,6 +31,27 @@ namespace TrenchBroom {
             assert(std::less_equal<const char *>()(m_begin, m_end));
         }
 
+        CharArrayReader CharArrayReader::view(const size_t offset) const {
+            assert(offset <= size());
+            
+            const char* newBegin = m_begin;
+            std::advance(newBegin, offset);
+            
+            return CharArrayReader(newBegin, m_end);
+        }
+        
+        CharArrayReader CharArrayReader::view(const size_t offset, const size_t length) const {
+            assert(offset + length <= size());
+            
+            const char* newBegin = m_begin;
+            std::advance(newBegin, offset);
+            
+            const char* newEnd = newBegin;
+            std::advance(newEnd, length);
+            
+            return CharArrayReader(newBegin, newEnd);
+        }
+
         size_t CharArrayReader::size() const {
             return static_cast<size_t>(m_end - m_begin);
         }
@@ -74,6 +95,10 @@ namespace TrenchBroom {
             buffer[size] = 0;
             read(buffer.data(), size);
             return String(buffer.data());
+        }
+
+        void CharArrayReader::skipString(const size_t size) {
+            skip<char>(size);
         }
     }
 }

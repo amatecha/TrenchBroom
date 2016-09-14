@@ -45,6 +45,9 @@ namespace TrenchBroom {
         public:
             CharArrayReader(const char* begin, const char* end);
 
+            CharArrayReader view(size_t offset) const;
+            CharArrayReader view(size_t offset, size_t length) const;
+            
             size_t size() const;
             void seekFromBegin(size_t offset);
             void seekFromEnd(size_t offset);
@@ -61,30 +64,60 @@ namespace TrenchBroom {
                 read(reinterpret_cast<char*>(&result), sizeof(T));
                 return static_cast<R>(result);
             }
+            
+            template <typename T>
+            void skip(size_t count = 1) {
+                seekForward(count * sizeof(T));
+            }
 
             template <typename T>
             char readChar() {
                 return read<T, char>();
+            }
+            
+            template <typename T>
+            void skipChar() {
+                skip<T>();
             }
 
             template <typename T>
             unsigned char readUnsignedChar() {
                 return read<T, unsigned char>();
             }
+            
+            template <typename T>
+            void skipUnsignedChar() {
+                skip<T>();
+            }
 
             template <typename T>
             int readInt() {
                 return read<T, int>();
+            }
+            
+            template <typename T>
+            void skipInt() {
+                skip<T>();
             }
 
             template <typename T>
             unsigned int readUnsignedInt() {
                 return read<T, unsigned int>();
             }
+            
+            template <typename T>
+            void skipUnsignedInt() {
+                skip<T>();
+            }
 
             template <typename T>
             size_t readSize() {
                 return read<T, size_t>();
+            }
+            
+            template <typename T>
+            void skipSize() {
+                skip<T>();
             }
 
             template <typename T>
@@ -93,16 +126,32 @@ namespace TrenchBroom {
             }
 
             template <typename T>
+            void skipBool() {
+                skip<T>();
+            }
+
+            template <typename T>
             float readFloat() {
                 return read<T, float>();
             }
 
             template <typename T>
+            void skipFloat() {
+                skip<T>();
+            }
+            
+            template <typename T>
             double readDouble() {
                 return read<T, double>();
             }
 
+            template <typename T>
+            void skipDouble() {
+                skip<T>();
+            }
+
             String readString(size_t size);
+            void skipString(size_t size);
 
             template <typename R, size_t S, typename T>
             Vec<T,S> readVec() {
@@ -111,16 +160,36 @@ namespace TrenchBroom {
                     result[i] = read<T, R>();
                 return result;
             }
+            
+            template <typename R, size_t S, typename T>
+            void skipVec() {
+                skip<T>(S);
+            }
 
             template <typename C, typename T, typename R>
             void read(C& col, const size_t n) {
                 read<T, R>(std::back_inserter(col), n);
             }
+            
+            template <typename T>
+            void readRawVector(std::vector<T>& vec) {
+                read(reinterpret_cast<char*>(vec.data()), vec.size() * sizeof(T));
+            }
 
+            template <typename C, typename T, typename R>
+            void skip(C& col, const size_t n) {
+                skip<T>(n);
+            }
+            
             template <typename T, typename R, typename I>
             void read(I out, const size_t n) {
                 for (size_t i = 0; i < n; ++i)
                     out += read<T,R>();
+            }
+            
+            template <typename T, typename R, typename I>
+            void skip(I out, const size_t n) {
+                skip<T>(n);
             }
         };
     }
