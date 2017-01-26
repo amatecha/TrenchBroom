@@ -18,6 +18,7 @@ GOTO END
 
 :ERROR
 
-echo "Building TrenchBroom failed"
+ECHO "Building TrenchBroom failed"
+EXIT /B 1
 
 :END
